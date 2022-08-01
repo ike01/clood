@@ -16,6 +16,9 @@ functions:
           path: /
           method: get
           cors: true
+  authorizerFunc:
+    handler: handler.authorizerFunc
+
   all_projects:
     handler: handler.all_projects
     events:
@@ -129,6 +132,20 @@ functions:
       - http:
           path: retain
           method: post
+          cors: true
+  login:
+    handler: handler.login
+    events:
+      - http:
+          path: login
+          method: post
+          cors: true
+  startup:
+    handler: handler.system_init
+    events:
+      - http:
+          path: startup
+          method: get
           cors: true
 plugins:
   - serverless-python-requirements

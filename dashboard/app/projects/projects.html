@@ -49,6 +49,7 @@
       <thead>
         <tr>
           <tr>
+            <th>Id</th>
             <th>Name</th>
             <th>Description</th>
             <th>Duplicates</th>
@@ -57,6 +58,7 @@
       </thead>
       <tbody id="projectsTableBody">
         <tr ng-repeat="item in projects">
+          <td>{{ item.id__ }}</td>
           <td>{{ item.name }}</td>
           <td>{{ item.description }}</td>
           <td>

@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+import jwt
 import copy
 import uuid
 import requests
@@ -20,6 +21,7 @@ import config as cfg
 sys.path.append(os.path.abspath("others"))
 import project
 import utility
+import user
 
 # Local: functions for CBR cycle
 sys.path.append(os.path.abspath("cbrcycle"))
@@ -40,6 +42,7 @@ is_dev = cfg.is_dev
 # dbs
 projects_db = "projects"
 config_db = "config"
+user_db = "users"
 
 headers = {
   'Access-Control-Allow-Origin': '*',
@@ -73,6 +76,16 @@ def getESConn():
     connection_class=RequestsHttpConnection
   )
   return esconn
+
+
+def verify_token(es, req_token):
+  '''
+  Checks if token is valid (can be improved).
+  Returns true if the token exists and false otherwise.
+  '''
+  res = utility.getByUniqueField(es, user_db, "token", req_token)
+  print(res)
+  return len(res) > 0
 
 
 # The functions below are also exposed through the API (as specified in 'serverless.yml')
@@ -538,7 +551,7 @@ def cbr_retain(event, context=None):
   es = getESConn()
   if proj is None:
     projId = params.get('projectId')  # name of casebase
-    proj = utility.getByUniqueField(es, projects_db, "casebase", projId)
+    proj = utility.getByUniqueField(es, projects_db, "_id", projId)
   # print(params)
   new_case = params['data']
   new_case = retrieve.add_vector_fields(proj['attributes'], new_case)  # add vectors to Semantic USE fields
@@ -559,10 +572,66 @@ def cbr_retain(event, context=None):
   return response
 
 
+def login(event, context=None):
+  """
+  End-point: Authenticates user and assigns an access token.
+  """
+  result = {}
+  # login logic here
+  statusCode = 201
+  params = json.loads(event['body'])  # parameters in request body
+  print(params)
+  email = params.get('email')
+  encoded_jwt = jwt.encode({"email": email}, "secret", algorithm="HS256")
+  result['token'] = encoded_jwt
+  print(result)
+
+  response = {
+    "statusCode": statusCode,
+    "headers": headers,
+    "body": json.dumps(result)
+  }
+  return response
+
+
+
+def system_init(event, context=None):
+  """
+  End-point: Seeds database and creates the default user. Should run after initial deployment.
+  """
+  # add configuration to the database
+  re_create_config(event=None, context=None)
+  # create the default user (if not existing)
+  es = getESConn()
+  if not es.indices.exists(index=user_db):
+    new_user = {
+      'username': cfg.DEFAULT_USERNAME,
+      'password': cfg.DEFAULT_PASSWORD
+    }
+    res = user.createUser(es, new_user, cfg.SECRET, user_db)
+
+  response = {
+    "statusCode": 200,
+    "headers": headers
+  }
+  return response
+
+
 def home(event, context):
   """
   End-point: To check API reachability.
   """
+  headr = event['headers']
+  auth = headr.get('Authorization')
+  tok = None
+  if auth is not None:
+    tok = auth.split()[1]
+
+  print(tok)
+
+  if verify_token(getESConn(), tok):
+    print('valid token')
+
   body = {
     "message": "Go Serverless with CloodCBR! Your function executed successfully!"
   }

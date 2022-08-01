@@ -10,6 +10,7 @@ angular.module('cloodApp', [
   'ngTouch',
   'ui.bootstrap',
   'toaster',
+  'cloodApp.user',
   'cloodApp.projects',
   'cloodApp.config',
   'cloodApp.cbr',

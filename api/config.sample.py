@@ -17,3 +17,7 @@ is_dev = True
 use_vectoriser = "http://cloodcbr-other-use:4100/dev/vectorise"
 # service for ontology-based similarity
 ontology_sim = "http://cloodcbr-other-ontology-sim:4200/dev"
+
+DEFAULT_USERNAME = 'admin'
+DEFAULT_PASSWORD = 'adminpass'
+SECRET = 'secret'

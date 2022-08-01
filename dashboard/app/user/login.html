@@ -1,0 +1,32 @@
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+  <h1 class="page-header">CBR Projects</h1>
+
+  <!-- New project form -->
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="p-5">
+        <div class="text-center">
+          <h1 class="h4 text-gray-900 mb-4">Sign into your account</h1>
+        </div>
+        <form id="userLogin" name="userLogin">
+          <div class="form-group">
+            <label for="email">Email address</label>
+            <input type="text" id="email" class="form-control" ng-model="newUser.email" placeholder="Enter email" required>
+          </div>
+          <form id="newProjectForm">
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" class="form-control" ng-model="newUser.password" placeholder="Password" required>
+          </div>
+
+          <div class="col-sm-4">
+            <button type="button" ng-click="login(newUser)" class="btn btn-primary btn-block" ng-disabled="!userLogin.$valid">
+              Login
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
